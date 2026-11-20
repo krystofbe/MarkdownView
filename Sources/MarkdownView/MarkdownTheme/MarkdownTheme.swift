@@ -38,6 +38,8 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var footnote = UIFont.preferredFont(forTextStyle: .footnote)
             /// Per-level heading fonts (index 0 is h1). Empty keeps `title` for every level.
             public var headings: [UIFont] = []
+            /// Font of table header text. nil keeps a bold system font at the text size.
+            public var tableHeader: UIFont?
         #elseif canImport(AppKit)
             public var body = NSFont.systemFont(ofSize: NSFont.systemFontSize)
             public var codeInline = NSFont.monospacedSystemFont(
@@ -55,6 +57,7 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var footnote = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
             /// Per-level heading fonts (index 0 is h1). Empty keeps `title` for every level.
             public var headings: [NSFont] = []
+            public var tableHeader: NSFont?
         #endif
     }
 
@@ -174,6 +177,8 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
 
     public struct Table: Equatable, @unchecked Sendable {
         public var cornerRadius: CGFloat = 8
+        /// Whether cell text can be selected on its own. Turn off when the host owns selection.
+        public var cellsSelectable = true
         public var borderWidth: CGFloat = 1
         #if canImport(UIKit)
             public var borderColor = UIColor.separator

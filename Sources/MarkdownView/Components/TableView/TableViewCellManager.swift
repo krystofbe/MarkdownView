@@ -166,7 +166,7 @@ struct TableLayoutMetrics: Equatable {
                 cell = cells[index]
             }
 
-            cell.isSelectable = true
+            cell.isSelectable = theme.table.cellsSelectable
 
             let styledText = styledText(
                 from: attributedText,
@@ -241,7 +241,11 @@ struct TableLayoutMetrics: Equatable {
             if isHeader {
                 attributedText.enumerateAttribute(.font, in: range, options: []) {
                     value, subRange, _ in
-                    if let existingFont = value as? PlatformFont {
+                    if let headerFont = theme.fonts.tableHeader,
+                       let existingFont = value as? PlatformFont, existingFont == theme.fonts.body
+                    {
+                        attributedText.addAttribute(.font, value: headerFont, range: subRange)
+                    } else if let existingFont = value as? PlatformFont {
                         let boldFont = PlatformFont.boldSystemFont(ofSize: existingFont.pointSize)
                         attributedText.addAttribute(.font, value: boldFont, range: subRange)
                     } else {
@@ -301,6 +305,7 @@ struct TableLayoutMetrics: Equatable {
 
             for (index, cell) in cells.enumerated() {
                 cell.selectionBackgroundColor = theme.colors.selectionBackground
+                cell.isSelectable = theme.table.cellsSelectable
                 let source = index < rawTexts.count ? rawTexts[index] : cell.attributedText
                 let styled = styledText(
                     from: source,
