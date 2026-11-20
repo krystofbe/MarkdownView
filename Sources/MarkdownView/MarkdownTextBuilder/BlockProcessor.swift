@@ -139,6 +139,14 @@ final class BlockProcessor {
         guard result.length > 0 else { return result }
 //        result.append(.init(string: "\n"))
 
+        if let quoteText = theme.colors.quoteText {
+            // Recolor plain body text only, so links and other colored runs keep their color.
+            result.enumerateAttribute(.foregroundColor, in: NSRange(location: 0, length: result.length)) { value, range, _ in
+                guard value == nil || (value as? PlatformColor) == theme.colors.body else { return }
+                result.addAttribute(.foregroundColor, value: quoteText, range: range)
+            }
+        }
+
         result.addAttribute(
             .paragraphStyle,
             value: baseParagraphStyle, range: NSRange(location: 0, length: result.length)

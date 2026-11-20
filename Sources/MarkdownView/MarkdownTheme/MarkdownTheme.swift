@@ -85,6 +85,12 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var inlineCodeBackground: UIColor?
             /// Bullet and number color. nil keeps the first run's text color.
             public var listMarker: UIColor?
+            /// Left bar of block quotes. nil keeps the text color at 10 % alpha.
+            public var quoteBar: UIColor?
+            /// Text color inside block quotes. nil keeps the body color.
+            public var quoteText: UIColor?
+            /// Thematic break line. nil keeps the text color at 10 % alpha.
+            public var rule: UIColor?
         #elseif canImport(AppKit)
             public var body = NSColor.labelColor
             public var highlight =
@@ -105,6 +111,9 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var link: NSColor?
             public var inlineCodeBackground: NSColor?
             public var listMarker: NSColor?
+            public var quoteBar: NSColor?
+            public var quoteText: NSColor?
+            public var rule: NSColor?
         #endif
     }
 

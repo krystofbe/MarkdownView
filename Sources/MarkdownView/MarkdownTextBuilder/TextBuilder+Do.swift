@@ -199,9 +199,9 @@ extension TextBuilder {
 
                 context.setLineWidth(1)
                 #if canImport(UIKit)
-                    context.setStrokeColor(UIColor.label.withAlphaComponent(0.1).cgColor)
+                    context.setStrokeColor((theme.colors.rule ?? UIColor.label.withAlphaComponent(0.1)).cgColor)
                 #elseif canImport(AppKit)
-                    context.setStrokeColor(NSColor.labelColor.withAlphaComponent(0.1).cgColor)
+                    context.setStrokeColor((theme.colors.rule ?? NSColor.labelColor.withAlphaComponent(0.1)).cgColor)
                 #endif
                 context.move(to: .init(x: boundingBox.minX, y: boundingBox.midY))
                 context.addLine(to: .init(x: boundingBox.minX + view.bounds.width, y: boundingBox.midY))
@@ -222,7 +222,7 @@ extension TextBuilder {
                     width: 4,
                     height: quotingLineHeight
                 )
-                context.setFillColor(theme.colors.body.withAlphaComponent(0.1).cgColor)
+                context.setFillColor((theme.colors.quoteBar ?? theme.colors.body.withAlphaComponent(0.1)).cgColor)
                 let roundedPath = CGPath(roundedRect: lineRect, cornerWidth: 2, cornerHeight: 2, transform: nil)
                 context.addPath(roundedPath)
                 context.fillPath()
