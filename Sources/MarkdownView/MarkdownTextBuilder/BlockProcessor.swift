@@ -39,26 +39,30 @@ final class BlockProcessor {
         self.blockquoteDrawing = blockquoteDrawing
     }
 
-    func processHeading(level _: Int, contents: [MarkdownInlineNode]) -> NSAttributedString {
-        let font: PlatformFont = theme.fonts.title
+    func processHeading(level: Int, contents: [MarkdownInlineNode]) -> NSAttributedString {
+        let headings = theme.fonts.headings
+        let font: PlatformFont = headings.isEmpty
+            ? theme.fonts.title
+            : headings[min(max(level, 1), headings.count) - 1]
 
         return buildWithParagraphSync { paragraph in
-            paragraph.paragraphSpacing = 16
-            paragraph.paragraphSpacingBefore = 16
+            paragraph.paragraphSpacing = theme.spacings.headingAfter
+            paragraph.paragraphSpacingBefore = theme.spacings.headingBefore
         } content: {
             let string = contents.render(theme: theme, context: context, viewProvider: viewProvider)
-            string.addAttributes(
-                [.font: font],
-                range: NSRange(location: 0, length: string.length)
-            )
+            let range = NSRange(location: 0, length: string.length)
+            string.addAttributes([.font: font], range: range)
+            if level >= 6, let color = theme.colors.headingSecondary {
+                string.addAttribute(.foregroundColor, value: color, range: range)
+            }
             return string
         }
     }
 
     func processParagraph(contents: [MarkdownInlineNode]) -> NSAttributedString {
         buildWithParagraphSync { paragraph in
-            paragraph.paragraphSpacing = 16
-            paragraph.lineSpacing = 4
+            paragraph.paragraphSpacing = theme.spacings.paragraph
+            paragraph.lineSpacing = theme.spacings.lineSpacing
         } content: {
             let rendered = contents.render(theme: theme, context: context, viewProvider: viewProvider)
             if rendered.length == 0 {
@@ -115,7 +119,7 @@ final class BlockProcessor {
         baseParagraphStyle.headIndent = 16
         baseParagraphStyle.tailIndent = -4
         baseParagraphStyle.paragraphSpacing = 8
-        baseParagraphStyle.lineSpacing = 4
+        baseParagraphStyle.lineSpacing = theme.spacings.lineSpacing
 
         for child in children {
             guard case let .paragraph(content) = child else {
@@ -201,8 +205,8 @@ extension BlockProcessor {
         content: () -> NSMutableAttributedString
     ) -> NSMutableAttributedString {
         var paragraphStyle: NSMutableParagraphStyle = .init()
-        paragraphStyle.paragraphSpacing = 16
-        paragraphStyle.lineSpacing = 4
+        paragraphStyle.paragraphSpacing = theme.spacings.paragraph
+        paragraphStyle.lineSpacing = theme.spacings.lineSpacing
         modifier(&paragraphStyle)
 
         let string = content()

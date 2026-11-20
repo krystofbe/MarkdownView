@@ -87,6 +87,14 @@ final class TextBuilder {
         for node in nodes {
             text.append(processBlock(node, context: context, subviews: &subviewCollector))
         }
+        if theme.spacings.trimsTrailingParagraphSpacing, text.length > 0 {
+            let last = (text.string as NSString).paragraphRange(for: NSRange(location: text.length - 1, length: 0))
+            text.enumerateAttribute(.paragraphStyle, in: last) { value, range, _ in
+                guard let style = (value as? NSParagraphStyle)?.mutableCopy() as? NSMutableParagraphStyle else { return }
+                style.paragraphSpacing = 0
+                text.addAttribute(.paragraphStyle, value: style, range: range)
+            }
+        }
         text.fixAttributes(in: .init(location: 0, length: text.length))
         if !pendingHighlightRequests.isEmpty {
             CodeHighlighter.current.scheduleHighlight(requests: pendingHighlightRequests)

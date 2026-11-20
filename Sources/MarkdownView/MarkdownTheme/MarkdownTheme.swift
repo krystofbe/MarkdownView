@@ -36,6 +36,8 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var largeTitle = UIFont.preferredFont(forTextStyle: .body).bold
             public var title = UIFont.preferredFont(forTextStyle: .body).bold
             public var footnote = UIFont.preferredFont(forTextStyle: .footnote)
+            /// Per-level heading fonts (index 0 is h1). Empty keeps `title` for every level.
+            public var headings: [UIFont] = []
         #elseif canImport(AppKit)
             public var body = NSFont.systemFont(ofSize: NSFont.systemFontSize)
             public var codeInline = NSFont.monospacedSystemFont(
@@ -51,6 +53,8 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var largeTitle = NSFont.systemFont(ofSize: NSFont.systemFontSize).bold
             public var title = NSFont.systemFont(ofSize: NSFont.systemFontSize).bold
             public var footnote = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+            /// Per-level heading fonts (index 0 is h1). Empty keeps `title` for every level.
+            public var headings: [NSFont] = []
         #endif
     }
 
@@ -73,6 +77,8 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
                 (UIColor(named: "AccentColor")
                         ?? UIColor(named: "accentColor")
                         ?? .systemOrange).withAlphaComponent(0.2)
+            /// Color of level 6 headings. nil keeps the text color.
+            public var headingSecondary: UIColor?
         #elseif canImport(AppKit)
             public var body = NSColor.labelColor
             public var highlight =
@@ -89,6 +95,7 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
                 (NSColor(named: "AccentColor")
                         ?? NSColor(named: "accentColor")
                         ?? .systemOrange).withAlphaComponent(0.2)
+            public var headingSecondary: NSColor?
         #endif
     }
 
@@ -99,6 +106,15 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
         public var general: CGFloat = 8
         public var list: CGFloat = 8
         public var cell: CGFloat = 32
+        /// Space after a paragraph and after the last item of a list.
+        public var paragraph: CGFloat = 16
+        /// Extra space between the lines of a paragraph, list item or quote.
+        public var lineSpacing: CGFloat = 4
+        /// Space around headings.
+        public var headingBefore: CGFloat = 16
+        public var headingAfter: CGFloat = 16
+        /// Drops the space after the last paragraph so stacked views control the gap themselves.
+        public var trimsTrailingParagraphSpacing = false
     }
 
     public var spacings: Spacings = .init()
