@@ -255,3 +255,12 @@ private extension [MarkdownInlineNode] {
         }.joined()
     }
 }
+
+public extension NSAttributedString {
+    /// The text an attachment run stands for when copied (a table's tab-separated cells), or nil when
+    /// `value` is no attachment. Lets a host read it without linking Litext itself.
+    @MainActor
+    static func markdownAttachmentRepresentation(of value: Any?) -> String? {
+        (value as? TextLabel.Attachment)?.attributedStringRepresentation().string
+    }
+}
