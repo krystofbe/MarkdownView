@@ -14,6 +14,9 @@ import MarkdownParser
     public final class MarkdownTextView: UIView {
         public var linkHandler: ((LinkPayload, NSRange, CGPoint) -> Void)?
         public var codePreviewHandler: ((String?, NSAttributedString) -> Void)?
+        /// Whether tapping an inline formula opens the built-in preview. A host that draws or handles
+        /// formulas itself turns it off; the tap then does nothing.
+        public var presentsMathPreview = true
 
         public internal(set) var content: MarkdownContent = .init()
 
@@ -131,6 +134,9 @@ import MarkdownParser
     public final class MarkdownTextView: NSView {
         public var linkHandler: ((LinkPayload, NSRange, CGPoint) -> Void)?
         public var codePreviewHandler: ((String?, NSAttributedString) -> Void)?
+        /// Whether tapping an inline formula opens the built-in preview. A host that draws or handles
+        /// formulas itself turns it off; the tap then does nothing.
+        public var presentsMathPreview = true
 
         public internal(set) var content: MarkdownContent = .init()
 

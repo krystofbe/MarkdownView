@@ -45,7 +45,9 @@ import Litext
         public func textLabelView(_: TextLabelView, didTapHighlightRegion highlightRegion: TextLabel.HighlightRegion, at location: CGPoint) {
 
             if let latexContent = highlightRegion.attributes[.mathLatexContent] as? String {
-                presentMathPreview(for: latexContent, theme: theme)
+                if presentsMathPreview {
+                    presentMathPreview(for: latexContent, theme: theme)
+                }
                 return
             }
 
@@ -94,7 +96,9 @@ import Litext
         public func textLabelView(_: TextLabelView, didTapHighlightRegion highlightRegion: TextLabel.HighlightRegion, at location: CGPoint) {
 
             if let latexContent = highlightRegion.attributes[.mathLatexContent] as? String {
-                presentMathPreview(for: latexContent, theme: theme)
+                if presentsMathPreview {
+                    presentMathPreview(for: latexContent, theme: theme)
+                }
                 return
             }
 
