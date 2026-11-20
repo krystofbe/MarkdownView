@@ -217,9 +217,13 @@ private extension MarkdownParser.SpecializeContext {
                 paragraphs.append(.paragraph(content: content))
             case let .codeBlock(_, content):
                 paragraphs.append(.paragraph(content: [.text(content)]))
-            case .blockquote:
-                // blockquote 应该已经被提取到顶级，这里不应该出现
-                assertionFailure("blockquote should not appear in list items")
+            case let .blockquote(nestedChildren):
+                // A quote nested in a list item inside a quote: keep its text.
+                paragraphs.append(contentsOf: flattenBlockquoteChildren(nestedChildren))
+            case let .table(_, rows):
+                for row in rows {
+                    paragraphs.append(contentsOf: row.cells.map { .paragraph(content: $0.content) })
+                }
             case let .bulletedList(_, items):
                 paragraphs.append(contentsOf: extractParagraphs(from: items))
             case let .numberedList(_, _, items):

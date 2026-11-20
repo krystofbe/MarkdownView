@@ -65,11 +65,11 @@ final class ListProcessor {
         return 1
     }
 
-    private func renderListItem(_ item: ListItem, reduceLineSpacing: Bool = false, total _: Int) -> NSAttributedString {
+    private func renderListItem(_ item: ListItem, levelIndent: CGFloat, reduceLineSpacing: Bool = false, total _: Int) -> NSAttributedString {
         let paragraphStyle: NSMutableParagraphStyle = .init()
         paragraphStyle.paragraphSpacing = reduceLineSpacing ? 8 : theme.spacings.paragraph
         paragraphStyle.lineSpacing = theme.spacings.lineSpacing
-        let indent = CGFloat(item.depth + 1) * 24
+        let indent = CGFloat(item.depth + 1) * levelIndent
         paragraphStyle.firstLineHeadIndent = indent
         paragraphStyle.headIndent = indent
 
@@ -102,10 +102,20 @@ final class ListProcessor {
         return string
     }
 
+    /// 24 pt per level, widened so the widest "n." of a text-style numbered list fits before the text
+    /// at the current body font and Dynamic Type size.
+    private func levelIndent(for items: [ListItem]) -> CGFloat {
+        guard theme.listNumberStyle == .text, let widest = items.filter(\.ordered).map(\.index).max() else { return 24 }
+        let label = NSAttributedString(string: "\(widest).", attributes: [.font: theme.fonts.body])
+        let width = CTLineGetTypographicBounds(CTLineCreateWithAttributedString(label), nil, nil, nil)
+        return max(24, ceil(width + 8))
+    }
+
     private func renderListItems(_ items: [ListItem]) -> NSAttributedString {
         let result = NSMutableAttributedString()
+        let levelIndent = levelIndent(for: items)
         for (index, item) in items.enumerated() {
-            let rendered = renderListItem(item, reduceLineSpacing: index != items.count - 1, total: items.count)
+            let rendered = renderListItem(item, levelIndent: levelIndent, reduceLineSpacing: index != items.count - 1, total: items.count)
             result.append(rendered)
         }
         return result
