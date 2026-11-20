@@ -24,6 +24,7 @@ public final class MarkdownContent: @unchecked Sendable {
     public let highlightMaps: [Int: CodeHighlighter.HighlightMap]
     public let locale: Locale
     @MainActor private var inlineRenderCache: [InlineRenderCacheKey: NSAttributedString] = [:]
+    @MainActor private var lastBodySignature: (font: PlatformFont, color: PlatformColor, signature: String)?
 
     public init(
         blocks: [MarkdownBlockNode],
@@ -70,12 +71,26 @@ public final class MarkdownContent: @unchecked Sendable {
         locale = .autoupdatingCurrent
     }
 
+    /// The signature costs a few string formats, and a build asks for it once per text node, so it is
+    /// remembered for the font and color objects it was made from.
+    @MainActor
+    private func bodyCacheSignature(for theme: MarkdownTheme) -> String {
+        let font = theme.fonts.body
+        let color = theme.colors.body
+        if let last = lastBodySignature, last.font === font, last.color === color {
+            return last.signature
+        }
+        let signature = theme.inlineBodyCacheSignature
+        lastBodySignature = (font, color, signature)
+        return signature
+    }
+
     @MainActor
     func cachedBodyText(_ text: String, theme: MarkdownTheme) -> NSAttributedString {
         let key = InlineRenderCacheKey(
             text: text,
             localeIdentifier: locale.identifier,
-            themeSignature: theme.inlineBodyCacheSignature
+            themeSignature: bodyCacheSignature(for: theme)
         )
         if let cached = inlineRenderCache[key] {
             return cached

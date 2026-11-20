@@ -67,6 +67,15 @@ extension TextBuilder {
         return .init(x: lineOrigin.x, y: lineOrigin.y - descent, width: width, height: ascent + descent)
     }
 
+    /// Whether the paragraph of `line` runs right to left: the direction of its logically first run.
+    static func isRightToLeft(_ line: CTLine) -> Bool {
+        let runs = line.glyphRuns()
+        guard let first = runs.min(by: { CTRunGetStringRange($0).location < CTRunGetStringRange($1).location }) else {
+            return false
+        }
+        return CTRunGetStatus(first).contains(.rightToLeft)
+    }
+
     static func build(view: MarkdownTextView, viewProvider: ReusableViewProvider) -> BuildResult {
         let context: MarkdownContent = view.content
         let theme: MarkdownTheme = view.theme
@@ -94,8 +103,9 @@ extension TextBuilder {
                 let radius: CGFloat = 3
                 let boundingBox = lineBoundingBox(line, lineOrigin: lineOrigin)
                 populateContextColorFromFirstRun(context: context, line: line)
+                // The marker stands on the side the text starts from: right of the line in right-to-left text.
                 let rect = CGRect(
-                    x: boundingBox.minX - 16,
+                    x: isRightToLeft(line) ? boundingBox.maxX + 16 - radius * 2 : boundingBox.minX - 16,
                     y: boundingBox.midY - radius,
                     width: radius * 2,
                     height: radius * 2
@@ -121,7 +131,11 @@ extension TextBuilder {
                     context.saveGState()
                     defer { context.restoreGState() }
                     context.textMatrix = .identity
-                    context.textPosition = .init(x: lineOrigin.x - 6 - labelWidth, y: lineOrigin.y)
+                    let startsRight = isRightToLeft(line)
+                    context.textPosition = .init(
+                        x: startsRight ? lineBoundingBox(line, lineOrigin: lineOrigin).maxX + 6 : lineOrigin.x - 6 - labelWidth,
+                        y: lineOrigin.y
+                    )
                     CTLineDraw(labelLine, context)
                     return
                 }
