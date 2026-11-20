@@ -83,6 +83,8 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var link: UIColor?
             /// Inline code background used as is. nil keeps `codeBackground` at 5 % alpha.
             public var inlineCodeBackground: UIColor?
+            /// Bullet and number color. nil keeps the first run's text color.
+            public var listMarker: UIColor?
         #elseif canImport(AppKit)
             public var body = NSColor.labelColor
             public var highlight =
@@ -102,6 +104,7 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var headingSecondary: NSColor?
             public var link: NSColor?
             public var inlineCodeBackground: NSColor?
+            public var listMarker: NSColor?
         #endif
     }
 
@@ -133,6 +136,15 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
     }
 
     public var links: Links = .init()
+
+    public enum ListNumberStyle: Equatable, Sendable {
+        /// Numbers 0 to 50 as circled symbols (original look).
+        case circle
+        /// "n." in the body font.
+        case text
+    }
+
+    public var listNumberStyle: ListNumberStyle = .circle
 
     public enum EmphasisStyle: Equatable, Sendable {
         /// Thick underline in `colors.emphasis` (original look).

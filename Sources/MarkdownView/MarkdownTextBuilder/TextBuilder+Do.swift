@@ -82,6 +82,7 @@ extension TextBuilder {
             {
                 textColor = color
             }
+            if let marker = theme.colors.listMarker { textColor = marker }
             context.setStrokeColor(textColor.cgColor)
             context.setFillColor(textColor.cgColor)
             return textColor
@@ -108,6 +109,22 @@ extension TextBuilder {
                 }
             }
             .withNumberedDrawing { context, line, lineOrigin, num in
+                if theme.listNumberStyle == .text {
+                    // "n." in the body font, right-aligned just before the text on its baseline.
+                    let textColor = populateContextColorFromFirstRun(context: context, line: line)
+                    let label = NSAttributedString(string: "\(num).", attributes: [
+                        .font: theme.fonts.body,
+                        .foregroundColor: textColor,
+                    ])
+                    let labelLine = CTLineCreateWithAttributedString(label)
+                    let labelWidth = CTLineGetTypographicBounds(labelLine, nil, nil, nil)
+                    context.saveGState()
+                    defer { context.restoreGState() }
+                    context.textMatrix = .identity
+                    context.textPosition = .init(x: lineOrigin.x - 6 - labelWidth, y: lineOrigin.y)
+                    CTLineDraw(labelLine, context)
+                    return
+                }
                 let rect = lineBoundingBox(line, lineOrigin: lineOrigin)
                     .offsetBy(dx: -16, dy: 0)
                     .offsetBy(dx: -8, dy: 0)
