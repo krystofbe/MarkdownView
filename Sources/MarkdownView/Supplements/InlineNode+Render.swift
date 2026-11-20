@@ -48,6 +48,22 @@ extension MarkdownInlineNode {
         case let .emphasis(children):
             let ans = NSMutableAttributedString()
             children.map { $0.render(theme: theme, context: context, viewProvider: viewProvider) }.forEach { ans.append($0) }
+            if theme.emphasisStyle == .italic {
+                // Italic trait on top of whatever the run already has, so bold italic works.
+                ans.enumerateAttribute(.font, in: NSRange(location: 0, length: ans.length)) { value, range, _ in
+                    #if canImport(UIKit)
+                        let font = (value as? UIFont) ?? theme.fonts.body
+                        let traits = font.fontDescriptor.symbolicTraits.union(.traitItalic)
+                        let italic = font.fontDescriptor.withSymbolicTraits(traits)
+                            .map { UIFont(descriptor: $0, size: font.pointSize) } ?? theme.fonts.italic
+                    #elseif canImport(AppKit)
+                        let font = (value as? NSFont) ?? theme.fonts.body
+                        let italic = font.italic
+                    #endif
+                    ans.addAttribute(.font, value: italic, range: range)
+                }
+                return ans
+            }
             ans.addAttributes(
                 [
                     .underlineStyle: NSUnderlineStyle.thick.rawValue,

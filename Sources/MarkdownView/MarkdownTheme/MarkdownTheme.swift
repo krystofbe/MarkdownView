@@ -117,6 +117,15 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
         public var trimsTrailingParagraphSpacing = false
     }
 
+    public enum EmphasisStyle: Equatable, Sendable {
+        /// Thick underline in `colors.emphasis` (original look).
+        case underline
+        /// Italic font trait, combinable with bold.
+        case italic
+    }
+
+    public var emphasisStyle: EmphasisStyle = .underline
+
     public var spacings: Spacings = .init()
 
     public struct Sizes: Equatable, Sendable {
