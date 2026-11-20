@@ -79,6 +79,8 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
                         ?? .systemOrange).withAlphaComponent(0.2)
             /// Color of level 6 headings. nil keeps the text color.
             public var headingSecondary: UIColor?
+            /// Link text color. nil keeps `highlight`.
+            public var link: UIColor?
         #elseif canImport(AppKit)
             public var body = NSColor.labelColor
             public var highlight =
@@ -96,6 +98,7 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
                         ?? NSColor(named: "accentColor")
                         ?? .systemOrange).withAlphaComponent(0.2)
             public var headingSecondary: NSColor?
+            public var link: NSColor?
         #endif
     }
 
@@ -116,6 +119,17 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
         /// Drops the space after the last paragraph so stacked views control the gap themselves.
         public var trimsTrailingParagraphSpacing = false
     }
+
+    public struct Links: Equatable, Sendable {
+        /// Underline for link text, for example `[.single, .patternDot]`. nil draws none.
+        public var underlineStyle: NSUnderlineStyle?
+        /// Text appended to every link, for example an arrow. nil appends nothing.
+        public var suffix: String?
+        /// Suffix size relative to the body font.
+        public var suffixScale: CGFloat = 0.7
+    }
+
+    public var links: Links = .init()
 
     public enum EmphasisStyle: Equatable, Sendable {
         /// Thick underline in `colors.emphasis` (original look).

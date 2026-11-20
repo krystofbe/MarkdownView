@@ -105,13 +105,24 @@ extension MarkdownInlineNode {
         case let .link(destination, children):
             let ans = NSMutableAttributedString()
             children.map { $0.render(theme: theme, context: context, viewProvider: viewProvider) }.forEach { ans.append($0) }
-            ans.addAttributes(
-                [
+            let linkColor = theme.colors.link ?? theme.colors.highlight
+            var linkAttributes: [NSAttributedString.Key: Any] = [
+                .link: destination,
+                .foregroundColor: linkColor,
+            ]
+            if let style = theme.links.underlineStyle {
+                linkAttributes[.underlineStyle] = style.rawValue
+            }
+            ans.addAttributes(linkAttributes, range: NSRange(location: 0, length: ans.length))
+            if let suffix = theme.links.suffix, ans.length > 0 {
+                // Part of the link region (tapping it opens the link) but not of the selectable text.
+                ans.append(NSAttributedString(string: suffix, attributes: [
                     .link: destination,
-                    .foregroundColor: theme.colors.highlight,
-                ],
-                range: NSRange(location: 0, length: ans.length)
-            )
+                    .font: theme.fonts.body.withSize(theme.fonts.body.pointSize * theme.links.suffixScale),
+                    .foregroundColor: linkColor,
+                    .markdownSkipSelection: true,
+                ]))
+            }
             return ans
         case let .image(source, _): // children => alternative text can be ignored?
             return NSAttributedString(
@@ -213,4 +224,9 @@ extension MarkdownInlineNode {
             }
         }
     }
+}
+
+public extension NSAttributedString.Key {
+    /// Characters that are drawn but left out of selection and copy, such as a link suffix.
+    static let markdownSkipSelection = NSAttributedString.Key("MarkdownView.skipSelection")
 }
