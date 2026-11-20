@@ -27,6 +27,8 @@ import MarkdownParser
             didSet {
                 guard oldValue != theme else { return }
                 textLabelView.selectionBackgroundColor = theme.colors.selectionBackground
+                // Nothing to rebuild before the first content arrives.
+                guard !content.blocks.isEmpty else { return }
                 use(content)
             }
         }
@@ -50,14 +52,8 @@ import MarkdownParser
             textLabelView.backgroundColor = .clear
             textLabelView.selectionBackgroundColor = theme.colors.selectionBackground
             textLabelView.delegate = self
-            textLabelView.translatesAutoresizingMaskIntoConstraints = false
+            // Frame layout in layoutSubviews: Auto Layout per view is measurable cost in long lists.
             addSubview(textLabelView)
-            NSLayoutConstraint.activate([
-                textLabelView.leadingAnchor.constraint(equalTo: leadingAnchor),
-                textLabelView.trailingAnchor.constraint(equalTo: trailingAnchor),
-                textLabelView.topAnchor.constraint(equalTo: topAnchor),
-                textLabelView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            ])
             setupCombine()
         }
 
@@ -68,6 +64,7 @@ import MarkdownParser
 
         override public func layoutSubviews() {
             super.layoutSubviews()
+            textLabelView.frame = bounds
             textLabelView.preferredMaxLayoutWidth = bounds.width
             textLabelView.layoutIfNeeded()
             syncContextViewLayout()
@@ -147,6 +144,8 @@ import MarkdownParser
             didSet {
                 guard oldValue != theme else { return }
                 textLabelView.selectionBackgroundColor = theme.colors.selectionBackground
+                // Nothing to rebuild before the first content arrives.
+                guard !content.blocks.isEmpty else { return }
                 use(content)
             }
         }
