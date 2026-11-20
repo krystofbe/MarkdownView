@@ -158,6 +158,15 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
 
     public var listNumberStyle: ListNumberStyle = .circle
 
+    public enum ImageStyle: Equatable, Sendable {
+        /// The source URL as link text (original look).
+        case sourceLink
+        /// The alt text, or the file name without one, as a link to the source.
+        case altTextLink
+    }
+
+    public var imageStyle: ImageStyle = .sourceLink
+
     public enum EmphasisStyle: Equatable, Sendable {
         /// Thick underline in `colors.emphasis` (original look).
         case underline

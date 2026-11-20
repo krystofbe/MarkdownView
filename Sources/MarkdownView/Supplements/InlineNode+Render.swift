@@ -124,6 +124,18 @@ extension MarkdownInlineNode {
                 ]))
             }
             return ans
+        case let .image(source, children) where theme.imageStyle == .altTextLink:
+            // Alt text (else the file name) as a link to the source, never the raw URL.
+            let alt = children.plainText.trimmingCharacters(in: .whitespacesAndNewlines)
+            let fallback = URL(string: source)?.lastPathComponent ?? ""
+            let title = alt.isEmpty ? (fallback.isEmpty ? source : fallback) : alt
+            var attributes: [NSAttributedString.Key: Any] = [
+                .link: source,
+                .font: theme.fonts.body,
+                .foregroundColor: theme.colors.link ?? theme.colors.highlight,
+            ]
+            if let style = theme.links.underlineStyle { attributes[.underlineStyle] = style.rawValue }
+            return NSAttributedString(string: title, attributes: attributes)
         case let .image(source, _): // children => alternative text can be ignored?
             return NSAttributedString(
                 string: source,
@@ -229,4 +241,17 @@ extension MarkdownInlineNode {
 public extension NSAttributedString.Key {
     /// Characters that are drawn but left out of selection and copy, such as a link suffix.
     static let markdownSkipSelection = NSAttributedString.Key("MarkdownView.skipSelection")
+}
+
+private extension [MarkdownInlineNode] {
+    var plainText: String {
+        map { node in
+            switch node {
+            case let .text(string), let .code(string), let .html(string): string
+            case .softBreak, .lineBreak: " "
+            case .math: ""
+            default: node.children.plainText
+            }
+        }.joined()
+    }
 }
