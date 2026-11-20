@@ -81,6 +81,8 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
             public var headingSecondary: UIColor?
             /// Link text color. nil keeps `highlight`.
             public var link: UIColor?
+            /// Inline code background used as is. nil keeps `codeBackground` at 5 % alpha.
+            public var inlineCodeBackground: UIColor?
         #elseif canImport(AppKit)
             public var body = NSColor.labelColor
             public var highlight =
@@ -99,6 +101,7 @@ public struct MarkdownTheme: Equatable, @unchecked Sendable {
                         ?? .systemOrange).withAlphaComponent(0.2)
             public var headingSecondary: NSColor?
             public var link: NSColor?
+            public var inlineCodeBackground: NSColor?
         #endif
     }
 

@@ -40,7 +40,7 @@ extension MarkdownInlineNode {
         case let .code(string), let .html(string):
             let controlAttributes: [NSAttributedString.Key: Any] = [
                 .font: theme.fonts.codeInline,
-                .backgroundColor: theme.colors.codeBackground.withAlphaComponent(0.05),
+                .backgroundColor: theme.colors.inlineCodeBackground ?? theme.colors.codeBackground.withAlphaComponent(0.05),
             ]
             let text = NSMutableAttributedString(string: string, attributes: [.foregroundColor: theme.colors.code])
             text.addAttributes(controlAttributes, range: .init(location: 0, length: text.length))
